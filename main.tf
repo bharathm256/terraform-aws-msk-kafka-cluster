@@ -20,6 +20,27 @@ resource "aws_msk_cluster" "this" {
             type = try(public_access.value.type, null)
           }
         }
+
+        dynamic "vpc_connectivity" {
+          for_each = try([connectivity_info.value.vpc_connectivity], [])
+
+          content {
+            dynamic "client_authentication" {
+              for_each = try([vpc_connectivity.value.client_authentication], [])
+
+              content {
+                dynamic "sasl" {
+                  for_each = try([client_authentication.value.sasl], [])
+
+                  content {
+                    iam   = try(sasl.value.iam, null)
+                    scram = try(sasl.value.scram, null)
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
 

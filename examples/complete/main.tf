@@ -65,6 +65,15 @@ module "msk_cluster" {
   create_scram_secret_association          = true
   scram_secret_association_secret_arn_list = [for x in aws_secretsmanager_secret.this : x.arn]
 
+  # connectivity info
+  broker_node_connectivity_info = {
+    vpc_connectivity = {
+      client_authentication = {
+        sasl = { scram = true }
+      }
+    }
+  }
+
   # schema registry
   schema_registries = {
     team_a = {
